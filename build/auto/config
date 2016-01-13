@@ -1,0 +1,30 @@
+#!/bin/sh
+
+set -e
+
+lb config noauto \
+   --apt-recommends "false" \
+   --architectures "armhf" \
+   --archive-areas "main firmware non-free" \
+   --binary-filesystem "fat32" \
+   --binary-images "hdd" \
+   --bootloader "rpi" \
+   --bootstrap-qemu-arch "armhf" \
+   --bootstrap-qemu-static "/usr/bin/qemu-arm-static" \
+   --cache-stages "false" \
+   --chroot-filesystem "squashfs" \
+   --debootstrap-options "--keyring /etc/rasbian.public.keyring" \
+   --initramfs "live-boot" \
+   --linux-flavours "rpi rpi2-rpfv" \
+   --memtest "none" \
+   --mirror-binary "http://archive.raspbian.org/raspbian" \
+   --mirror-bootstrap "http://archive.raspbian.org/raspbian" \
+   --mirror-chroot "http://archive.raspbian.org/raspbian" \
+   --mirror-debian-installer "http://archive.raspbian.org/raspbian" \
+   --parent-mirror-binary "http://archive.raspbian.org/raspbian" \
+   --parent-mirror-bootstrap "http://archive.raspbian.org/raspbian" \
+   --parent-mirror-chroot "http://archive.raspbian.org/raspbian" \
+   --parent-mirror-debian-installer "http://archive.raspbian.org/raspbian" \
+   --security "false" \
+   --win32-loader "false" \
+   # keep this line

@@ -1,0 +1,16 @@
+avahi-daemon
+ifupdown
+inetutils-ping
+iptraf
+isc-dhcp-client
+isc-dhcp-server
+live-boot
+live-config
+live-config-systemd
+net-tools
+openssh-server
+patch
+raspberrypi-bootloader-nokernel
+rpi-update
+sudo
+user-setup

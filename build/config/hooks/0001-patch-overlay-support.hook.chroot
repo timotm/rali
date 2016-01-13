@@ -1,0 +1,51 @@
+#!/bin/sh
+
+echo "Patching live-boot to support overlay.."
+cd /lib/live/boot && patch -p2 <<'EOF'
+diff --git a/components/9990-misc-helpers.sh b/components/9990-misc-helpers.sh
+index fb139ec..f8cd443 100755
+--- a/components/9990-misc-helpers.sh
++++ b/components/9990-misc-helpers.sh
+@@ -1322,7 +1322,7 @@ do_union ()
+ 			pidof unionfs-fuse >> /run/sendsigs.omit.d/unionfs-fuse || true )
+ 			;;
+ 
+-		overlayfs)
++		overlayfs|overlay)
+ 			# XXX: can multiple unionro be used? (overlayfs only handles two dirs, but perhaps they can be chained?)
+ 			# XXX: and can unionro be optional? i.e. can overlayfs skip lowerdir?
+ 			if echo ${unionro} | grep -q " "
+@@ -1333,7 +1333,18 @@ do_union ()
+ 				panic "Overlayfs needs at least one lower filesystem (read-only branch)."
+ 			fi
+ 			unionmountopts="-o noatime,lowerdir=${unionro},upperdir=${unionrw}"
+-			mount -t ${UNIONTYPE} ${unionmountopts} ${UNIONTYPE} "${unionmountpoint}"
++			if ! mount -t ${UNIONTYPE} ${unionmountopts} ${UNIONTYPE} "${unionmountpoint}" 2>/dev/null; then
++				# Ref: kiwi from OpenSuse kiwi-7.02.18-1.1
++				# overlayfs in version >= v22 behaves differently
++				# + renamed from overlayfs to overlay
++				# + requires a workdir to become mounted
++				# + requires workdir and upperdir to reside under the same mount
++				# + requires workdir and upperdir to be in separate subdirs
++				mkdir ${unionrw}/rw
++				mkdir ${unionrw}/work
++				unionmountopts="-o noatime,lowerdir=${unionro},upperdir=${unionrw}/rw,workdir=${unionrw}/work"
++				mount -t ${UNIONTYPE} ${unionmountopts} ${UNIONTYPE} "${unionmountpoint}"
++			fi
+ 			;;
+ 
+ 		*)
+diff --git a/components/9990-overlay.sh b/components/9990-overlay.sh
+index 52c045a..6695aaa 100755
+--- a/components/9990-overlay.sh
++++ b/components/9990-overlay.sh
+@@ -9,7 +9,7 @@ setup_unionfs ()
+ 	addimage_directory="${3}"
+ 
+ 	case ${UNIONTYPE} in
+-		aufs|unionfs|overlayfs)
++		aufs|unionfs|overlayfs|overlay)
+ 			modprobe -q -b ${UNIONTYPE}
+ 
+ 			if ! cut -f2 /proc/filesystems | grep -q "^${UNIONTYPE}\$" && [ -x /bin/unionfs-fuse ]
+EOF

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+. /usr/share/initramfs-tools/hook-functions
+
+echo "Copying overlay module"
+manual_add_modules overlay
