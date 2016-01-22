@@ -6,6 +6,7 @@ live-image.dd: up
 	vagrant ssh-config > .tmp-ssh-config
 	rsync -Pav -e 'ssh -F .tmp-ssh-config' "default:/vagrant/build/live-image-armhf" ./
 	rm -f .tmp-ssh-config
+	vagrant halt
 
 up:
 	vagrant up
