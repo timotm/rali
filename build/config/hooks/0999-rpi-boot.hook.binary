@@ -1,11 +1,11 @@
 #!/bin/sh
 
 # Installs the Raspberry PI firmware (bootloader, kernel etc)
-FILES="bootcode.bin fixup_cd.dat fixup.dat fixup_x.dat start_cd.elf start.elf start_x.elf"
+FILES="bootcode.bin fixup_cd.dat fixup.dat fixup_x.dat start_cd.elf start_db.elf start.elf start_x.elf bcm*dtb"
 
 for FILE in ${FILES}
 do
-    cp -LT chroot/boot/${FILE} binary/${FILE}
+    cp -L chroot/boot/${FILE} binary/
 done
 
 cat >binary/issue.txt <<EOF
@@ -13,7 +13,7 @@ Built on $(date +'%F %T')
 EOF
 
 cat >binary/cmdline.txt <<EOF
-dwc_otg.lpm_enable=0 console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p1 elevator=deadline rootwait boot=live initrd=-1 union=overlay config hostname=pi.local username=pi persistence
+dwc_otg.lpm_enable=0 console=ttyAMA0,115200 kgdboc=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p1 elevator=deadline rootwait boot=live initrd=-1 union=overlay config hostname=pi.local username=pi persistence nonetworking
 EOF
 
 initrd_for_kernel ()
@@ -32,6 +32,10 @@ kernel live/${rpi_kernel}
 initramfs live/$(initrd_for_kernel ${rpi_kernel}) followkernel
 
 [pi2]
+kernel live/${rpi2_kernel}
+initramfs live/$(initrd_for_kernel ${rpi2_kernel}) followkernel
+
+[pi3]
 kernel live/${rpi2_kernel}
 initramfs live/$(initrd_for_kernel ${rpi2_kernel}) followkernel
 
