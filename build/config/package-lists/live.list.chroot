@@ -1,4 +1,8 @@
 avahi-daemon
+cups
+g++
+gcc
+iftop
 ifupdown
 inetutils-ping
 iptraf
@@ -7,10 +11,17 @@ isc-dhcp-server
 live-boot
 live-config
 live-config-systemd
+make
 net-tools
+ntp
 openssh-server
 patch
+python
 raspberrypi-bootloader-nokernel
 rpi-update
+screen
 sudo
+tcpdump
+usb-modeswitch
 user-setup
+wvdial

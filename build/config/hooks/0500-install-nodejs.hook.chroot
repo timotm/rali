@@ -1,0 +1,9 @@
+#!/bin/sh
+
+wget --no-check-certificate https://nodejs.org/dist/v4.2.6/node-v4.2.6-linux-armv7l.tar.gz
+sha256sum -c <<EOF
+104d75d428a77a23cc646757cc5624d22fd8705026cf712ef6b826368efeae6f  node-v4.2.6-linux-armv7l.tar.gz
+EOF
+tar -C /usr/local -xvzf node-v4.2.6-linux-armv7l.tar.gz
+mv /usr/local/node-v4.2.6-linux-armv7l/* /usr/local
+rm -rf /usr/local/node-v4.2.6-linux-armv7l node-v4.2.6-linux-armv7l.tar.gz
