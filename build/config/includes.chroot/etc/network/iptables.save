@@ -1,0 +1,22 @@
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+-A POSTROUTING -o eth2 -j MASQUERADE
+-A POSTROUTING -o eth1 -j MASQUERADE
+-A POSTROUTING -o eth0 -j MASQUERADE
+COMMIT
+#
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -m state --state RELATED,ESTABLISHED -m comment --comment "allow inbound traffic for established and related connections" -j ACCEPT
+-A INPUT -p tcp -m tcp --dport 22 -m comment --comment "allow SSH to this host from anywhere" -j ACCEPT
+-A INPUT -s 127.0.0.1/32 -d 127.0.0.1/32 -m comment --comment "allow any local-only traffic" -j ACCEPT
+-A INPUT -p icmp -m comment --comment "allow ICMP traffic to this host from anywhere" -j ACCEPT
+-A FORWARD -m state --state RELATED,ESTABLISHED -m comment --comment "allow inbound traffic for established and related connections" -j ACCEPT
+-A FORWARD -i eth0 -m comment --comment "allow all Internet bound traffic from the internal network" -j ACCEPT
+-A FORWARD -p icmp -m comment --comment "forward any ICMP traffic" -j ACCEPT
+COMMIT

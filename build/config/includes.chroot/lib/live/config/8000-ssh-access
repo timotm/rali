@@ -1,0 +1,42 @@
+#!/bin/sh
+
+Cmdline ()
+{
+        # Reading kernel command line
+        for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+        do
+                case "${_PARAMETER}" in
+                        live-config.username=*|username=*)
+                                LIVE_USERNAME="${_PARAMETER#*username=}"
+                                ;;
+                esac
+        done
+}
+
+Init ()
+{
+        # Checking if package is installed or already configured
+        if [ -e "/home/${LIVE_USERNAME}/.ssh/authorized_keys" ]
+        then
+                exit 0
+        fi
+
+        echo -n " ssh access"
+}
+
+Config ()
+{
+    _KEYFILE="/home/${LIVE_USERNAME}/.ssh/authorized_keys"
+    mkdir -p $(dirname ${_KEYFILE})
+    cat > "${_KEYFILE}" <<'EOF'
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDMdFHyG2m0+TV+u5hfJtgcdl8XQfN4CfUWa1HVZLHPHZo2lnbmHCjs7c7JaBY6GgCsVavHuTOZZykBew2sn0zxYLiL+oARrZmzVkECLsppOpA7Wu+/T6iQ6/fGXDJspepZy+YURfPoGyMnWUCsHeipnuppS3pvLpSqsIqJXLcUvlQWSkhIY15iJ4zn6WSxLFBMF3RPMGBUcOxyoS1iOslvT+JLzowqxg9untQEjMxPM/700JvJPRXwW/QMaH1TvnFLBX5wIQk7ui3N1nM1hXrv1CqXgbDT9Yy6xdwuttdxXsVrePIqlsemQTpd7fuLNiZG9Su/6pFRacSL4GnKQh0V metsala@l488
+EOF
+
+    chown ${LIVE_USERNAME} "${_KEYFILE}"
+    chmod 0600 "${_KEYFILE}"
+}
+
+Cmdline
+Init
+Config
+

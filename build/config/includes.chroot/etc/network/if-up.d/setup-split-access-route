@@ -1,0 +1,36 @@
+#!/bin/bash
+
+ip_for_if()
+{
+    ifconfig "$1" | awk '/inet addr/{print substr($2,6)}'
+}
+
+router_for_dhcp_if()
+{
+    awk '/option routers/ {print $3}' < "/var/lib/dhcp/dhclient.$1.leases" | tail -1 | sed 's/[;,].*//'
+}
+
+network_for_if()
+{
+    _network_len=$(ip -o addr list "$1" | awk '/inet /{print $4}' | sed 's/[^/]*//')
+    IFS=. read -r i1 i2 i3 i4 <<< $(ip_for_if "$1")
+    IFS=. read -r m1 m2 m3 m4 <<< $(ifconfig "$1" | awk '/Mask/{print substr($4,6)}')
+    printf "%d.%d.%d.%d${_network_len}\n" "$((i1 & m1))" "$((i2 & m2))" "$((i3 & m3))" "$((i4 & m4))"
+}
+
+case "${IFACE}" in
+    eth1)
+        ;;
+    eth2)
+        ;;
+    *)
+        exit 0
+esac
+
+IP=$(ip_for_if ${IFACE})
+GW=$(router_for_dhcp_if ${IFACE})
+GW_NET=$(network_for_if ${IFACE})
+
+ip route add ${GW_NET} dev ${IFACE} src ${IP} table uplink.${IFACE}
+ip route add default via ${GW} table uplink.${IFACE}
+ip rule add from ${IP} table uplink.${IFACE}

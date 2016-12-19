@@ -1,0 +1,19 @@
+#!/bin/bash
+
+ip_for_if()
+{
+    ifconfig "$1" | awk '/inet addr/{print substr($2,6)}'
+}
+
+case "${IFACE}" in
+    eth1)
+        ;;
+    eth2)
+        ;;
+    *)
+        exit 0
+esac
+
+IP=$(ip_for_if "${IFACE}")
+
+ip rule del from ${IP} table uplink1.${IFACE} || true
