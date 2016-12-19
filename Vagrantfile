@@ -12,4 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provision "shell", path: "#{File.dirname(__FILE__)}/provision.sh"
+
+  config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__args: ["--verbose", "--archive", "--delete", "-z", "--no-owner", "--no-group"]
+
 end
