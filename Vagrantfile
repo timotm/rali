@@ -9,6 +9,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider :virtualbox do |vb|
     vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
+    vb.cpus = 1
   end
 
   config.vm.provision "shell", path: "#{File.dirname(__FILE__)}/provision.sh"
